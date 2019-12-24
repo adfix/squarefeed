@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @package Adfix_Squarefeed
+ * @author  Alona Tsarova
+ */
+-->
+
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceContainer name="content">
+            <block class="Adfix\Squarefeed\Block\Adminhtml\Main"
+                   name="squarefeed_index"
+                   template="Adfix_Squarefeed::content.phtml"/>
+        </referenceContainer>
+    </body>
+</page>

@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @package Adfix_Squarefeed
+ * @author  Alona Tsarova
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <event name="catalog_product_delete_after_done">
+        <observer name="sf_store_deleted_product_sku"
+                  instance="Adfix\Squarefeed\Model\Observer\StoreDeletedProductSku"/>
+    </event>
+</config>

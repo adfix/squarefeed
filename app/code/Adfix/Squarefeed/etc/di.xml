@@ -1,0 +1,60 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @package Adfix_Squarefeed
+ * @author  Alona Tsarova
+ */
+-->
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="Adfix\Squarefeed\Api\StockRegistryInterface" type="Adfix\Squarefeed\Model\StockRegistry"/>
+    <preference for="Adfix\Squarefeed\Api\ShippingInfoInterface" type="Adfix\Squarefeed\Model\ShippingInfo"/>
+    <preference for="Adfix\Squarefeed\Api\WebsiteProductsInterface" type="Adfix\Squarefeed\Model\WebsiteProducts"/>
+    <preference for="Adfix\Squarefeed\Api\ProductInterface" type="Adfix\Squarefeed\Model\Product"/>
+    <preference for="Adfix\Squarefeed\Api\ProductLinksInterface" type="Adfix\Squarefeed\Model\ProductLinks"/>
+    <preference for="Adfix\Squarefeed\Api\MetaTagInterface" type="Adfix\Squarefeed\Model\MetaTag"/>
+    <preference for="Adfix\Squarefeed\Api\JsonInterface" type="Adfix\Squarefeed\Model\Json"/>
+
+    <preference for="Adfix\Squarefeed\Model\ProductLinks\ProductOptionsInterface"
+                type="Adfix\Squarefeed\Model\ProductLinks\ProductOptions"/>
+    <type name="Adfix\Squarefeed\Model\ProductLinks\ProductOptions">
+        <arguments>
+            <argument name="productTypes" xsi:type="array">
+                <item name="configurable" xsi:type="string">Adfix\Squarefeed\Model\ProductLinks\Types\Configurable
+                </item>
+                <item name="bundle" xsi:type="string">Adfix\Squarefeed\Model\ProductLinks\Types\Bundle</item>
+                <item name="grouped" xsi:type="string">Adfix\Squarefeed\Model\ProductLinks\Types\Grouped</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <!-- custom log file -->
+    <type name="Adfix\Squarefeed\Logger\Handler">
+        <arguments>
+            <argument name="filesystem" xsi:type="object">Magento\Framework\Filesystem\Driver\File</argument>
+        </arguments>
+    </type>
+    <type name="Adfix\Squarefeed\Logger\Logger">
+        <arguments>
+            <argument name="name" xsi:type="string">squarefeed</argument>
+            <argument name="handlers" xsi:type="array">
+                <item name="system" xsi:type="object">Adfix\Squarefeed\Logger\Handler</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <!-- Plugins-->
+    <type name="Magento\Framework\View\Page\Config">
+        <plugin name="adfixGoogleMetaHead" type="Adfix\Squarefeed\Plugin\View\Page\Config"/>
+    </type>
+    <type name="\Magento\CatalogInventory\Model\Indexer\Stock">
+        <plugin name="setUpdatedAtTime" type="\Adfix\Squarefeed\Plugin\Catalog\Model\Indexer\SetUpdatedAtTime"/>
+    </type>
+    <type name="\Magento\Catalog\Model\Indexer\Product\Eav">
+        <plugin name="setUpdatedAtTime" type="\Adfix\Squarefeed\Plugin\Catalog\Model\Indexer\SetUpdatedAtTime"/>
+    </type>
+    <type name="\Magento\Catalog\Model\Indexer\Product\Price">
+        <plugin name="setUpdatedAtTime" type="\Adfix\Squarefeed\Plugin\Catalog\Model\Indexer\SetUpdatedAtTime"/>
+    </type>
+</config>

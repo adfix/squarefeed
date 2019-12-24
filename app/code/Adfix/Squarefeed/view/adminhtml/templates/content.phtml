@@ -1,0 +1,47 @@
+<?php
+/**
+ * @var $block \Adfix\Squarefeed\Block\Adminhtml\Main
+ */
+?>
+
+<script type="text/javascript">
+    function iframeLoad() {
+        var iframeElement = document.getElementById('SquarefeedIframe');
+        iframeElement.contentWindow.postMessage({
+            'command': "setUser",
+            'credentials': {
+                'consumerKey': "<?php echo $block->escapeHtml($block->getIntegration()->getConsumerKey()) ?>",
+                'consumerSecret': "<?php echo $block->escapeHtml($block->getIntegration()->getConsumerSecret()) ?>",
+                'accessToken': "<?php echo $block->escapeHtml($block->getIntegration()->getToken()) ?>",
+                'accessTokenSecret': "<?php echo $block->escapeHtml($block->getIntegration()->getTokenSecret()) ?>"
+            },
+            'storeCurrency': "<?php echo $block->escapeHtml($block->getStoreBaseCurrency()) ?>",
+            'storeLocale': "<?php echo $block->escapeHtml($block->getStoreLocale()) ?>",
+            'storeUrl': "<?php echo $block->escapeHtml($block->getStoreBaseUrl()) ?>",
+            'apiUrl': "<?php echo $block->escapeHtml($block->getApiUrl()) ?>",
+            'version': "<?php echo $block->escapeHtml($block->getMagentoVersion()) ?>",
+            'platform': "magento",
+            'appVersion': "2.0.2"
+        }, '*');
+
+        var eventMethod = window.addEventListener ? 'addEventListener' : 'attachEvent';
+        var eventer = window[eventMethod];
+        var messageEvent = eventMethod == 'attachEvent' ? 'onmessage' : 'message';
+        eventer(messageEvent, function (e) {
+            if (e.data.command === 'resize') {
+                document.getElementById('SquarefeedIframe').style.height = e.data.height + 'px';
+            }
+        }, false);
+    }
+</script>
+
+<iframe src="<?php echo $block->escapeHtml($block->getIframeUrl()) ?>"
+        id='SquarefeedIframe'
+        scrolling='yes'
+        frameBorder='0'
+        allowfullscreen
+        align='center'
+        onload='iframeLoad()'
+        style='width: 100%; min-height: 500px'>
+    <p><?php __('Your browser does not support iFrames.'); ?></p>
+</iframe>

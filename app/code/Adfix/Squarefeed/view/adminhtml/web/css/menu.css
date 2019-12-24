@@ -1,0 +1,15 @@
+@font-face {
+    font-family: 'icomoon';
+    src: url('../fonts/icomoon/icomoon.eot?r0l5yh');
+    src: url('../fonts/icomoon/icomoon.eot?r0l5yh#iefix') format('embedded-opentype'),
+    url('../fonts/icomoon/icomoon.ttf?r0l5yh') format('truetype'),
+    url('../fonts/icomoon/icomoon.woff?r0l5yh') format('woff'),
+    url('../fonts/icomoon/icomoon.svg?r0l5yh#icomoon') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
+.admin__menu .item-squarefeed.level-0 > a:before {
+    font-family: 'icomoon' !important;
+    content: "\e900";
+}

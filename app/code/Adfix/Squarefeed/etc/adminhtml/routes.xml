@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @package Adfix_Squarefeed
+ * @author  Alona Tsarova
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:App/etc/routes.xsd">
+    <router id="admin">
+        <route id="squarefeed" frontName="squarefeed">
+            <module name="Adfix_Squarefeed" before="Magento_Backend"/>
+        </route>
+    </router>
+</config>

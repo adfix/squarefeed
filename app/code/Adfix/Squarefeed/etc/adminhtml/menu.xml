@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @package Adfix_Squarefeed
+ * @author  Alona Tsarova
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <add id="Adfix_Squarefeed::squarefeed"
+             title="Squarefeed"
+             module="Adfix_Squarefeed"
+             sortOrder="80"
+             action="squarefeed"
+             resource="Adfix_Squarefeed::squarefeed"/>
+    </menu>
+</config>

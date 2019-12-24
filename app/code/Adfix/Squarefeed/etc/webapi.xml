@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @package Adfix_Squarefeed
+ * @author  Alona Tsarova
+ */
+-->
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
+    <route url="/V1/squarefeed/stockItems/" method="GET">
+        <service class="Adfix\Squarefeed\Api\StockRegistryInterface" method="getList"/>
+        <resources>
+            <resource ref="Adfix_Squarefeed::squarefeed"/>
+        </resources>
+    </route>
+    <route url="/V1/squarefeed/shippingInfo/" method="GET">
+        <service class="Adfix\Squarefeed\Api\ShippingInfoInterface" method="getShippingInfo"/>
+        <resources>
+            <resource ref="Adfix_Squarefeed::squarefeed"/>
+        </resources>
+    </route>
+    <route url="/V1/squarefeed/websiteProducts/" method="GET">
+        <service class="Adfix\Squarefeed\Api\WebsiteProductsInterface" method="getWebsiteProducts"/>
+        <resources>
+            <resource ref="Adfix_Squarefeed::squarefeed"/>
+        </resources>
+    </route>
+    <route url="/V1/squarefeed/products/" method="GET">
+        <service class="Adfix\Squarefeed\Api\ProductInterface" method="getList"/>
+        <resources>
+            <resource ref="Adfix_Squarefeed::squarefeed"/>
+        </resources>
+    </route>
+    <route url="/V1/squarefeed/products/links" method="GET">
+        <service class="Adfix\Squarefeed\Api\ProductLinksInterface" method="getList"/>
+        <resources>
+            <resource ref="Adfix_Squarefeed::squarefeed"/>
+        </resources>
+    </route>
+    <route url="/V1/squarefeed/metaTag" method="POST">
+        <service class="Adfix\Squarefeed\Api\MetaTagInterface" method="save"/>
+        <resources>
+            <resource ref="Adfix_Squarefeed::squarefeed"/>
+        </resources>
+    </route>
+    <route url="/V1/squarefeed/metaTag" method="DELETE">
+        <service class="Adfix\Squarefeed\Api\MetaTagInterface" method="delete"/>
+        <resources>
+            <resource ref="Adfix_Squarefeed::squarefeed"/>
+        </resources>
+    </route>
+    <route url="/V1/squarefeed/json/" method="GET">
+        <service class="Adfix\Squarefeed\Api\JsonInterface" method="getList"/>
+        <resources>
+            <resource ref="Adfix_Squarefeed::squarefeed"/>
+        </resources>
+    </route>
+</routes>

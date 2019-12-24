@@ -1,0 +1,21 @@
+{
+  "name": "adfix/squarefeed",
+  "description": "Module for easy creating google shopping ads.",
+  "suggest": {
+    "magento/module-webapi": "1.0.0-beta"
+  },
+  "type": "magento2-module",
+  "version": "2.0.2",
+  "license": [
+    "OSL-3.0",
+    "AFL-3.0"
+  ],
+  "autoload": {
+    "files": [
+      "registration.php"
+    ],
+    "psr-4": {
+      "Adfix\\Squarefeed\\": ""
+    }
+  }
+}
