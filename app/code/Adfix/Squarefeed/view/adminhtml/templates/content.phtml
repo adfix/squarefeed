@@ -8,21 +8,11 @@
     function iframeLoad() {
         var iframeElement = document.getElementById('SquarefeedIframe');
         iframeElement.contentWindow.postMessage({
-            'command': "setUser",
-            'credentials': {
-                'consumerKey': "<?php echo $block->escapeHtml($block->getIntegration()->getConsumerKey()) ?>",
-                'consumerSecret': "<?php echo $block->escapeHtml($block->getIntegration()->getConsumerSecret()) ?>",
-                'accessToken': "<?php echo $block->escapeHtml($block->getIntegration()->getToken()) ?>",
-                'accessTokenSecret': "<?php echo $block->escapeHtml($block->getIntegration()->getTokenSecret()) ?>"
-            },
-            'storeCurrency': "<?php echo $block->escapeHtml($block->getStoreBaseCurrency()) ?>",
-            'storeLocale': "<?php echo $block->escapeHtml($block->getStoreLocale()) ?>",
-            'storeUrl': "<?php echo $block->escapeHtml($block->getStoreBaseUrl()) ?>",
-            'apiUrl': "<?php echo $block->escapeHtml($block->getApiUrl()) ?>",
-            'version': "<?php echo $block->escapeHtml($block->getMagentoVersion()) ?>",
-            'platform': "magento",
-            'appVersion': "2.0.2"
+            'command': "setPlatforms",
+            'platforms': <?php echo $block->getPlatformData()?>
         }, '*');
+        
+        iframeElement.contentWindow.postMessage(<?php echo $block->getUserData() ?>, '*');
 
         var eventMethod = window.addEventListener ? 'addEventListener' : 'attachEvent';
         var eventer = window[eventMethod];

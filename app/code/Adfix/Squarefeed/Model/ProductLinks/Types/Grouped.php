@@ -6,6 +6,7 @@
 
 namespace Adfix\Squarefeed\Model\ProductLinks\Types;
 
+use Magento\Store\Model\StoreManagerInterface;
 use Magento\Framework\Pricing\PriceCurrencyInterface;
 use Magento\GroupedProduct\Model\Product\Type\Grouped as Type;
 use Adfix\Squarefeed\Model\ProductLinks\ProductOptionsInterface;
@@ -13,6 +14,11 @@ use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
 
 class Grouped implements ProductOptionsInterface
 {
+    /**
+     * @var StoreManagerInterface
+     */
+    protected $storeManager;
+
     /**
      * @var PriceCurrencyInterface
      */
@@ -26,14 +32,17 @@ class Grouped implements ProductOptionsInterface
     /**
      * Grouped constructor.
      *
+     * @param StoreManagerInterface $storeManager
      * @param CollectionFactory $collectionFactory
      * @param PriceCurrencyInterface $priceCurrency
      */
     public function __construct(
+        StoreManagerInterface $storeManager,
         CollectionFactory $collectionFactory,
         PriceCurrencyInterface $priceCurrency
     )
     {
+        $this->storeManager = $storeManager;
         $this->priceCurrency = $priceCurrency;
         $this->collectionFactory = $collectionFactory;
     }
@@ -49,6 +58,7 @@ class Grouped implements ProductOptionsInterface
     public function prepareData($lastUpdateDate = '')
     {
         $productCollection = $this->collectionFactory->create();
+        $productCollection->addStoreFilter($this->storeManager->getStore());
         $productCollection->addAttributeToFilter('type_id', ['eq' => Type::TYPE_CODE]);
 
         if ($lastUpdateDate) {

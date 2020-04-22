@@ -7,6 +7,7 @@
 namespace Adfix\Squarefeed\Model\ProductLinks\Types;
 
 use Magento\Bundle\Model\Product\Type;
+use Magento\Store\Model\StoreManagerInterface;
 use Magento\Catalog\Model\ResourceModel\Product\Collection;
 use Adfix\Squarefeed\Model\ProductLinks\ProductOptionsInterface;
 use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
@@ -14,6 +15,11 @@ use Magento\Bundle\Model\ResourceModel\Selection\Collection as SelectionCollecti
 
 class Bundle implements ProductOptionsInterface
 {
+    /**
+     * @var StoreManagerInterface
+     */
+    protected $storeManager;
+
     /**
      * Mapping for price types
      *
@@ -33,9 +39,11 @@ class Bundle implements ProductOptionsInterface
      * Bundle constructor.
      *
      * @param CollectionFactory $collectionFactory
+     * @param StoreManagerInterface $storeManager
      */
-    public function __construct(CollectionFactory $collectionFactory)
+    public function __construct(CollectionFactory $collectionFactory, StoreManagerInterface $storeManager)
     {
+        $this->storeManager = $storeManager;
         $this->collectionFactory = $collectionFactory;
     }
 
@@ -48,8 +56,8 @@ class Bundle implements ProductOptionsInterface
      */
     public function prepareData($lastUpdateDate = '')
     {
-        $bundleData = [];
         $productCollection = $this->collectionFactory->create();
+        $productCollection->addStoreFilter($this->storeManager->getStore());
         $productCollection->addAttributeToFilter('type_id', ['eq' => Type::TYPE_CODE]);
 
         if ($lastUpdateDate) {
@@ -63,6 +71,7 @@ class Bundle implements ProductOptionsInterface
             );
         }
 
+        $bundleData = [];
         foreach ($productCollection as $product) {
             $bundleData[$product->getId()]['options'] = $this->getFormattedBundleOptionValues($product);
         }

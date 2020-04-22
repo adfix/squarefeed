@@ -6,6 +6,7 @@
 
 namespace Adfix\Squarefeed\Model\ProductLinks\Types;
 
+use Magento\Store\Model\StoreManagerInterface;
 use Adfix\Squarefeed\Model\ProductLinks\ProductOptionsInterface;
 use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
 use Magento\ConfigurableProduct\Model\Product\Type\Configurable as Type;
@@ -13,16 +14,24 @@ use Magento\ConfigurableProduct\Model\Product\Type\Configurable as Type;
 class Configurable implements ProductOptionsInterface
 {
     /**
+     * @var StoreManagerInterface
+     */
+    protected $storeManager;
+
+    /**
      * @var CollectionFactory
      */
     protected $collectionFactory;
 
     /**
      * Configurable constructor.
+     *
      * @param CollectionFactory $collectionFactory
+     * @param StoreManagerInterface $storeManager
      */
-    public function __construct(CollectionFactory $collectionFactory)
+    public function __construct(CollectionFactory $collectionFactory, StoreManagerInterface $storeManager)
     {
+        $this->storeManager = $storeManager;
         $this->collectionFactory = $collectionFactory;
     }
 
@@ -35,8 +44,8 @@ class Configurable implements ProductOptionsInterface
      */
     public function prepareData($lastUpdateDate = '')
     {
-        $configurableData = [];
         $productCollection = $this->collectionFactory->create();
+        $productCollection->addStoreFilter($this->storeManager->getStore());
         $productCollection->addAttributeToFilter('type_id', ['eq' => Type::TYPE_CODE]);
 
         if ($lastUpdateDate) {
@@ -50,6 +59,7 @@ class Configurable implements ProductOptionsInterface
             );
         }
 
+        $configurableData = [];
         foreach ($productCollection as $product) {
             $variations = [];
             $variationsLabels = [];

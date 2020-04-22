@@ -10,12 +10,17 @@ use Magento\Backend\Block\Template;
 use Magento\Integration\Model\Integration;
 use Magento\Store\Api\Data\StoreInterface;
 use Magento\Backend\Block\Template\Context;
-use Magento\Framework\Locale\ResolverInterface;
 use Adfix\Squarefeed\Helper\Data as DataHelper;
 use Magento\Framework\App\ProductMetadataInterface;
 
 class Main extends Template
 {
+    const PLATFORM = 'magento';
+    const PLATFORM_FOR_SELECTION = 'squarefeed';
+    const STORE_URL_FOR_SELECTION = 'https://squarefeed.io';
+    const APP_VERSION = '2.0.2';
+    const API_URI = 'rest/V1/squarefeed/json';
+
     /**
      * @var StoreInterface
      */
@@ -32,11 +37,6 @@ class Main extends Template
     protected $dataHelper;
 
     /**
-     * @var ResolverInterface
-     */
-    protected $localeResolver;
-
-    /**
      * @var ProductMetadataInterface
      */
     protected $productMetadata;
@@ -46,21 +46,18 @@ class Main extends Template
      *
      * @param Context $context
      * @param DataHelper $dataHelper
-     * @param ResolverInterface $resolver
      * @param ProductMetadataInterface $productMetadata
      * @param array $data
      */
     public function __construct(
         Context $context,
         DataHelper $dataHelper,
-        ResolverInterface $resolver,
         ProductMetadataInterface $productMetadata,
         array $data = []
     )
     {
         parent::__construct($context, $data);
         $this->dataHelper = $dataHelper;
-        $this->localeResolver = $resolver;
         $this->productMetadata = $productMetadata;
     }
 
@@ -68,10 +65,119 @@ class Main extends Template
      * Retrieve iframe url
      *
      * @return string
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function getIframeUrl()
     {
-        return DataHelper::IFRAME_URL . '?platform=' .  $this->getPlatformInfo();
+        return DataHelper::IFRAME_URL . '?platform=' . $this->getPlatformInfo();
+    }
+
+    /**
+     * Retrieve platform info
+     *
+     * @return false|string
+     */
+    public function getPlatformData()
+    {
+        $storeData = [];
+
+        try {
+            $version = $this->getMagentoVersion();
+            $credentials = $this->getCredentialsData();
+            $stores = $this->_storeManager->getStores();
+            $useStoreViewCode = $this->dataHelper->useStoreViewCode();
+
+            /** @var \Magento\Store\Model\Store $store */
+            foreach ($stores as $store) {
+                if ($useStoreViewCode === false && !$store->isDefault()) {
+                    continue;
+                }
+
+                $storeData[] = [
+                    'credentials' => $credentials,
+                    'storeCurrency' => $store->getDefaultCurrencyCode(),
+                    'storeLocale' => $this->dataHelper->getStoreLocale($store->getCode()),
+                    'storeUrl' => $store->getBaseUrl(),
+                    'apiUrl' => $store->getBaseUrl() . self::API_URI,
+                    'version' => $version,
+                    'platform' => self::PLATFORM,
+                    'appVersion' => self::APP_VERSION
+                ];
+            }
+        } catch (\Exception $e) {
+        }
+
+        return json_encode($storeData, JSON_UNESCAPED_SLASHES);
+    }
+
+    /**
+     * Retrieve user data
+     *
+     * @return false|string
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
+    public function getUserData()
+    {
+        /** @var \Magento\Store\Model\Store $store */
+        $store = $this->getStore();
+        $userData = [
+            'command' => 'setUser',
+            'storeCurrency' => $store->getDefaultCurrencyCode(),
+            'storeLocale' => $this->dataHelper->getStoreLocale($store->getCode()),
+            'version' => $this->getMagentoVersion(),
+            'appVersion' => self::APP_VERSION
+        ];
+
+        $allStores = $this->_storeManager->getStores();
+        if (count($allStores) > 1) {
+            $userData['storeUrl'] = self::STORE_URL_FOR_SELECTION;
+            $userData['platform'] = self::PLATFORM_FOR_SELECTION;
+        } else {
+            $userData['credentials'] = $this->getCredentialsData();
+            $userData['storeUrl'] = $store->getBaseUrl();
+            $userData['apiUrl'] = $store->getBaseUrl() . self::API_URI;
+            $userData['platform'] = self::PLATFORM;
+        }
+
+        return json_encode($userData, JSON_UNESCAPED_SLASHES);
+    }
+
+    /**
+     * Retrieve integration credentials
+     *
+     * @return array
+     */
+    protected function getCredentialsData()
+    {
+        return [
+            'consumerKey' => $this->getIntegration()->getConsumerKey(),
+            'consumerSecret' => $this->getIntegration()->getConsumerSecret(),
+            'accessToken' => $this->getIntegration()->getToken(),
+            'accessTokenSecret' => $this->getIntegration()->getTokenSecret()
+        ];
+    }
+
+    /**
+     * Retrieve integration
+     *
+     * @return Integration
+     */
+    protected function getIntegration()
+    {
+        if (!$this->integration) {
+            $this->integration = $this->dataHelper->getIntegration();
+        }
+        return $this->integration;
+    }
+
+    /**
+     * Retrieve magento version
+     *
+     * @return string
+     */
+    protected function getMagentoVersion()
+    {
+        return $this->productMetadata->getVersion();
     }
 
     /**
@@ -80,59 +186,9 @@ class Main extends Template
      * @return mixed
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
-    public function getStoreBaseUrl()
+    protected function getStoreBaseUrl()
     {
         return $this->getStore()->getBaseUrl();
-    }
-
-    /**
-     * Retrieves API url
-     *
-     * @return string
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
-     */
-    public function getApiUrl()
-    {
-        return $this->getStore()->getBaseUrl() . 'rest/V1/squarefeed/json';
-    }
-
-    /**
-     * Retrieve store locale
-     *
-     * @return string
-     */
-    public function getStoreLocale()
-    {
-        return $this->localeResolver->getLocale();
-    }
-
-    /**
-     * Retrieve store base currency
-     *
-     * @return mixed
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
-     */
-    public function getStoreBaseCurrency()
-    {
-        return $this->getStore()->getBaseCurrencyCode();
-    }
-
-    /**
-     * Retrieve integration
-     *
-     * @return Integration
-     */
-    public function getIntegration()
-    {
-        if (!$this->integration) {
-            $this->integration = $this->dataHelper->getIntegration();
-        }
-        return $this->integration;
-    }
-
-    public function getMagentoVersion()
-    {
-        return $this->productMetadata->getVersion();
     }
 
     /**
@@ -154,15 +210,18 @@ class Main extends Template
      * Retrieve platform info
      *
      * @return string
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     protected function getPlatformInfo()
     {
-        $platformInfo = [
-            'platform' => 'magento',
-            'version' => $this->getMagentoVersion(),
-            'url' => $this->getStoreBaseUrl()
-        ];
+        try {
+            $platformInfo = [
+                'platform' => 'magento',
+                'version' => $this->getMagentoVersion(),
+                'url' => $this->getStoreBaseUrl()
+            ];
+        } catch (\Exception $e) {
+            $platformInfo = [];
+        }
 
         return urlencode(json_encode($platformInfo));
     }

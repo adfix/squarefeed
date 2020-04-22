@@ -8,6 +8,7 @@ namespace Adfix\Squarefeed\Helper;
 
 use Adfix\Squarefeed\Logger\Logger;
 use Magento\Framework\App\Helper\Context;
+use Magento\Framework\Locale\ResolverInterface;
 use Magento\Framework\App\Helper\AbstractHelper;
 use \Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Integration\Api\IntegrationServiceInterface;
@@ -36,6 +37,11 @@ class Data extends AbstractHelper
     protected $scopeConfig;
 
     /**
+     * @var ResolverInterface
+     */
+    protected $localeResolver;
+
+    /**
      * @var IntegrationServiceInterface
      */
     protected $integrationService;
@@ -47,21 +53,23 @@ class Data extends AbstractHelper
 
     /**
      * Data constructor.
-     *
      * @param Context $context
      * @param Logger $logger
+     * @param ResolverInterface $localeResolver
      * @param IntegrationServiceInterface $integrationService
      * @param IntegrationOauthService $integrationOauthService
      */
     public function __construct(
         Context $context,
         Logger $logger,
+        ResolverInterface $localeResolver,
         IntegrationServiceInterface $integrationService,
         IntegrationOauthService $integrationOauthService
     ) {
         parent::__construct($context);
 
         $this->logger = $logger;
+        $this->localeResolver = $localeResolver;
         $this->scopeConfig = $context->getScopeConfig();
         $this->integrationService = $integrationService;
         $this->integrationOauthService = $integrationOauthService;
@@ -113,6 +121,38 @@ class Data extends AbstractHelper
         }
 
         return $integration;
+    }
+
+    /**
+     * Retrieve store locale
+     *
+     * @param string|null $storeCode
+     * @return mixed
+     */
+    public function getStoreLocale($storeCode = null)
+    {
+        $locale = $this->scopeConfig->getValue(
+            $this->localeResolver->getDefaultLocalePath(),
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+            $storeCode);
+        if (!$locale) {
+            $locale = \Magento\Framework\Locale\Resolver::DEFAULT_LOCALE;
+        }
+
+        return $locale;
+    }
+
+    /**
+     * Use store view code in the base url
+     *
+     * @return bool
+     */
+    public function useStoreViewCode()
+    {
+        return (bool) $this->scopeConfig->getValue(
+            \Magento\Store\Model\Store::XML_PATH_STORE_IN_URL,
+            ScopeConfigInterface::SCOPE_TYPE_DEFAULT,
+            null);
     }
 
     /**

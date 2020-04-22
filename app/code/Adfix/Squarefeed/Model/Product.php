@@ -6,13 +6,12 @@
 
 namespace Adfix\Squarefeed\Model;
 
-use Magento\Store\Model\Store;
 use Adfix\Squarefeed\Logger\Logger;
 use Adfix\Squarefeed\Api\ProductInterface;
+use Magento\Store\Model\StoreManagerInterface;
 use Magento\Framework\Stdlib\DateTime\DateTime;
 use Magento\UrlRewrite\Model\UrlFinderInterface;
 use Magento\UrlRewrite\Service\V1\Data\UrlRewrite;
-use Magento\Framework\DB\Adapter\AdapterInterface;
 use Magento\Catalog\Model\ResourceModel\ProductFactory;
 use Magento\Eav\Model\Entity\Attribute\AbstractAttribute;
 use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory as ProductColFactory;
@@ -32,6 +31,11 @@ class Product implements ProductInterface
      * @var Logger
      */
     protected $logger;
+
+    /**
+     * @var StoreManagerInterface
+     */
+    protected $storeManager;
 
     /**
      * @var ProductFactory
@@ -54,6 +58,7 @@ class Product implements ProductInterface
      * @var AttrSetColFactory
      */
     protected $attrSetColFactory;
+
     /**
      * Attribute code to its values. Only attributes with options and only default store values used.
      *
@@ -93,8 +98,9 @@ class Product implements ProductInterface
      *
      * @param Logger $logger
      * @param DateTime $dateTime
-     * @param ProductFactory $productFactory
      * @param UrlFinderInterface $urlFinder
+     * @param ProductFactory $productFactory
+     * @param StoreManagerInterface $storeManager
      * @param ProductColFactory $productColFactory
      * @param AttrSetColFactory $attrSetColFactory
      * @param CategoryColFactory $categoryColFactory
@@ -104,8 +110,9 @@ class Product implements ProductInterface
     public function __construct(
         Logger $logger,
         DateTime $dateTime,
-        ProductFactory $productFactory,
         UrlFinderInterface $urlFinder,
+        ProductFactory $productFactory,
+        StoreManagerInterface $storeManager,
         ProductColFactory $productColFactory,
         AttrSetColFactory $attrSetColFactory,
         CategoryColFactory $categoryColFactory,
@@ -116,6 +123,7 @@ class Product implements ProductInterface
         $this->date = $dateTime;
         $this->logger = $logger;
         $this->urlFinder = $urlFinder;
+        $this->storeManager = $storeManager;
         $this->productFactory = $productFactory;
         $this->attrSetColFactory = $attrSetColFactory;
         $this->productCollection = $productColFactory->create();
@@ -144,6 +152,8 @@ class Product implements ProductInterface
         $this->productCollection->addAttributeToSelect('*');
         $this->productCollection->joinAttribute('status', 'catalog_product/status', 'entity_id', null, 'inner');
         $this->productCollection->joinAttribute('visibility', 'catalog_product/visibility', 'entity_id', null, 'inner');
+
+        $this->productCollection->addStoreFilter($this->getStore());
 
         $formatDate = null;
         if ((int)$lastUpdateTime > 0) {
@@ -371,7 +381,7 @@ class Product implements ProductInterface
         }
 
         $options = [];
-        $attribute->setStoreId(Store::DEFAULT_STORE_ID);
+        $attribute->setStoreId($this->getStore()->getId());
         try {
             foreach ($attribute->getSource()->getAllOptions(false) as $option) {
                 foreach (is_array($option['value']) ? $option['value'] : [$option] as $innerOption) {
@@ -426,5 +436,20 @@ class Product implements ProductInterface
             $this->attrSetIdToName[$attributeSet->getId()] = $attributeSet->getAttributeSetName();
         }
         return $this;
+    }
+
+    /**
+     * Retrieve current store
+     *
+     * @return $this|\Magento\Store\Api\Data\StoreInterface
+     */
+    protected function getStore()
+    {
+        try {
+            return $this->storeManager->getStore();
+        } catch (\Exception $e) {
+            $this->logger->addError($e->getMessage());
+            $this->logger->addError($e->getTraceAsString());
+        }
     }
 }
