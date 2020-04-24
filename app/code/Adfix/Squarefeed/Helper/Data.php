@@ -21,7 +21,7 @@ class Data extends AbstractHelper
 
     const PRODUCT_UPDATED_AT_TIME_ATTR = 'sf_updated_at';
 
-    const IFRAME_URL = 'https://core.squarefeed.io';
+    const IFRAME_URL = 'https://core.squarefeed.io:8088';
     const XML_META_TAG = 'squarefeed/settings/meta_tag';
     const API_INTEGRATION_NAME = 'Squarefeed';
     const API_INTEGRATION_EMAIL = 'support@squarefeed.io';
