@@ -25,7 +25,7 @@ class DeletedProductSku extends AbstractDb
         try {
             $this->getConnection()->truncateTable($this->getMainTable());
         } catch (\Exception $e) {
-
+            return false;
         }
     }
 }

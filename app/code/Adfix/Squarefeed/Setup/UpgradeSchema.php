@@ -55,5 +55,4 @@ class UpgradeSchema implements UpgradeSchemaInterface
 
         $installer->endSetup();
     }
-
 }

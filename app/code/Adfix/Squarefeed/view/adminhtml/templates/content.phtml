@@ -9,10 +9,10 @@
         var iframeElement = document.getElementById('SquarefeedIframe');
         iframeElement.contentWindow.postMessage({
             'command': "setPlatforms",
-            'platforms': <?php echo $block->getPlatformData()?>
+            'platforms': <?= /* @escapeNotVerified */ $block->getPlatformData()?>
         }, '*');
         
-        iframeElement.contentWindow.postMessage(<?php echo $block->getUserData() ?>, '*');
+        iframeElement.contentWindow.postMessage(<?= /* @escapeNotVerified */ $block->getUserData() ?>, '*');
 
         var eventMethod = window.addEventListener ? 'addEventListener' : 'attachEvent';
         var eventer = window[eventMethod];
@@ -25,7 +25,7 @@
     }
 </script>
 
-<iframe src="<?php echo $block->escapeHtml($block->getIframeUrl()) ?>"
+<iframe src="<?= $block->escapeHtml($block->getIframeUrl()) ?>"
         id='SquarefeedIframe'
         scrolling='yes'
         frameBorder='0'

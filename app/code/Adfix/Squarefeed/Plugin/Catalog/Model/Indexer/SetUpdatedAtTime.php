@@ -71,8 +71,8 @@ class SetUpdatedAtTime
         MetadataPool $metadataPool,
         ResourceConnection $resource,
         StoreManagerInterface $storeManager,
-        ObjectManagerInterface $objectManager)
-    {
+        ObjectManagerInterface $objectManager
+    ) {
         $this->logger = $logger;
         $this->request = $request;
         $this->resource = $resource;
@@ -100,7 +100,6 @@ class SetUpdatedAtTime
     public function beforeExecuteList(\Magento\Framework\Indexer\ActionInterface $subject, array $ids)
     {
         $this->setProductUpdateAtAttribute($ids);
-
     }
 
     /**

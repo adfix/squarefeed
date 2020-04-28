@@ -54,8 +54,7 @@ class UpgradeData implements UpgradeDataInterface
         EavSetupFactory $eavSetupFactory,
         OauthServiceInterface $oauthService,
         IntegrationServiceInterface $integrationService
-    )
-    {
+    ) {
         $this->logger = $logger;
         $this->oauthService = $oauthService;
         $this->eavSetupFactory = $eavSetupFactory;

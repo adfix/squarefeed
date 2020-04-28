@@ -12,8 +12,10 @@ class Collection extends AbstractCollection
 {
     public function _construct()
     {
-        $this->_init(\Adfix\Squarefeed\Model\DeletedProductSku::class,
-            \Adfix\Squarefeed\Model\ResourceModel\DeletedProductSku::class);
+        $this->_init(
+            \Adfix\Squarefeed\Model\DeletedProductSku::class,
+            \Adfix\Squarefeed\Model\ResourceModel\DeletedProductSku::class
+        );
     }
 
     /**

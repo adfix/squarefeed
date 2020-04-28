@@ -18,7 +18,7 @@ class Main extends Template
     const PLATFORM = 'magento';
     const PLATFORM_FOR_SELECTION = 'squarefeed';
     const STORE_URL_FOR_SELECTION = 'https://squarefeed.io';
-    const APP_VERSION = '2.0.2';
+    const APP_VERSION = '2.0.3';
     const API_URI = 'rest/V1/squarefeed/json';
 
     /**
@@ -54,8 +54,7 @@ class Main extends Template
         DataHelper $dataHelper,
         ProductMetadataInterface $productMetadata,
         array $data = []
-    )
-    {
+    ) {
         parent::__construct($context, $data);
         $this->dataHelper = $dataHelper;
         $this->productMetadata = $productMetadata;
@@ -79,8 +78,6 @@ class Main extends Template
      */
     public function getPlatformData()
     {
-        $storeData = [];
-
         try {
             $version = $this->getMagentoVersion();
             $credentials = $this->getCredentialsData();
@@ -105,6 +102,7 @@ class Main extends Template
                 ];
             }
         } catch (\Exception $e) {
+            $storeData = [];
         }
 
         return json_encode($storeData, JSON_UNESCAPED_SLASHES);

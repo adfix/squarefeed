@@ -134,7 +134,8 @@ class Data extends AbstractHelper
         $locale = $this->scopeConfig->getValue(
             $this->localeResolver->getDefaultLocalePath(),
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
-            $storeCode);
+            $storeCode
+        );
         if (!$locale) {
             $locale = \Magento\Framework\Locale\Resolver::DEFAULT_LOCALE;
         }
@@ -149,10 +150,11 @@ class Data extends AbstractHelper
      */
     public function useStoreViewCode()
     {
-        return (bool) $this->scopeConfig->getValue(
+        return (bool)$this->scopeConfig->getValue(
             \Magento\Store\Model\Store::XML_PATH_STORE_IN_URL,
             ScopeConfigInterface::SCOPE_TYPE_DEFAULT,
-            null);
+            null
+        );
     }
 
     /**

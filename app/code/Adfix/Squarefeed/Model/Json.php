@@ -119,8 +119,7 @@ class Json implements JsonInterface
         ScopeConfigInterface $scopeConfig,
         StoreManagerInterface $storeManager,
         ProductLinksInterface $productLinksApi
-    )
-    {
+    ) {
         $this->logger = $logger;
         $this->dateTime = $dateTime;
         $this->productApi = $productApi;
@@ -248,11 +247,27 @@ class Json implements JsonInterface
         $this->setSalePrice($product, $this->getCurrencyCode());
         $this->setImagesPath($product, $this->getBaseMediaUrl());
 
-        $product['gtin'] = ($product['gtin']) ?? $product['upc'] ?? $product['ean'] ?? '';
-        $product['price'] = isset($product['price']) ? round($product['price'], 2) . $this->getCurrencyCode() : '';
-        $product['brand'] = ($product['manufacturer']) ?? $product['brand'] ?? '';
+        if (!isset($product['gtin'])) {
+            if (isset($product['upc'])) {
+                $product['gtin'] = $product['upc'];
+            } elseif (isset($product['ean'])) {
+                $product['gtin'] = $product['ean'];
+            } else {
+                $product['gtin'] = '';
+            }
+        }
+
+        if (isset($product['manufacturer'])) {
+            $product['brand'] = $product['manufacturer'];
+        } elseif (!isset($product['brand'])) {
+            $product['brand'] = '';
+        }
+
+        $product['price'] = isset($product['price']) ?
+            round($product['price'], 2) . $this->getCurrencyCode() : '';
         $product['availability'] = $this->getProductAvailability($product['entity_id']);
-        $product['shipping_weight'] = (isset($product['weight'])) ? round($product['weight'], 2) . $this->getWeightUnit() : '';
+        $product['shipping_weight'] = (isset($product['weight'])) ?
+            round($product['weight'], 2) . $this->getWeightUnit() : '';
 
         if (isset($product['url_key']) && $product['url_key']) {
             $product['link'] = $this->getBaseUrl() . $product['url_key'];
@@ -481,4 +496,3 @@ class Json implements JsonInterface
         return $productsOptionsAssociation;
     }
 }
-

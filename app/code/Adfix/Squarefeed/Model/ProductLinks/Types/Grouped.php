@@ -40,8 +40,7 @@ class Grouped implements ProductOptionsInterface
         StoreManagerInterface $storeManager,
         CollectionFactory $collectionFactory,
         PriceCurrencyInterface $priceCurrency
-    )
-    {
+    ) {
         $this->storeManager = $storeManager;
         $this->priceCurrency = $priceCurrency;
         $this->collectionFactory = $collectionFactory;
@@ -62,10 +61,19 @@ class Grouped implements ProductOptionsInterface
         $productCollection->addAttributeToFilter('type_id', ['eq' => Type::TYPE_CODE]);
 
         if ($lastUpdateDate) {
-            $productCollection->joinAttribute(\Adfix\Squarefeed\Helper\Data::PRODUCT_UPDATED_AT_TIME_ATTR, 'catalog_product/' . \Adfix\Squarefeed\Helper\Data::PRODUCT_UPDATED_AT_TIME_ATTR, 'entity_id', null, 'left');
+            $productCollection->joinAttribute(
+                \Adfix\Squarefeed\Helper\Data::PRODUCT_UPDATED_AT_TIME_ATTR,
+                'catalog_product/' . \Adfix\Squarefeed\Helper\Data::PRODUCT_UPDATED_AT_TIME_ATTR,
+                'entity_id',
+                null,
+                'left'
+            );
             $productCollection->addAttributeToFilter(
                 [
-                    ['attribute' => \Adfix\Squarefeed\Helper\Data::PRODUCT_UPDATED_AT_TIME_ATTR, 'gteq' => $lastUpdateDate],
+                    [
+                        'attribute' => \Adfix\Squarefeed\Helper\Data::PRODUCT_UPDATED_AT_TIME_ATTR,
+                        'gteq' => $lastUpdateDate
+                    ],
                     ['attribute' => 'created_at', 'gteq' => $lastUpdateDate],
                     ['attribute' => 'updated_at', 'gteq' => $lastUpdateDate],
                 ]

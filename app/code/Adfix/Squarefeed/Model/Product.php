@@ -118,8 +118,7 @@ class Product implements ProductInterface
         CategoryColFactory $categoryColFactory,
         AttributeColFactory $attributeColFactory,
         DeletedProductColFactory $deletedProductColFactory
-    )
-    {
+    ) {
         $this->date = $dateTime;
         $this->logger = $logger;
         $this->urlFinder = $urlFinder;
@@ -163,7 +162,13 @@ class Product implements ProductInterface
 
             $formatDate = $this->date->gmtDate(null, (int)$lastUpdateTime);
 
-            $this->productCollection->joinAttribute(\Adfix\Squarefeed\Helper\Data::PRODUCT_UPDATED_AT_TIME_ATTR, 'catalog_product/' . \Adfix\Squarefeed\Helper\Data::PRODUCT_UPDATED_AT_TIME_ATTR, 'entity_id', null, 'left');
+            $this->productCollection->joinAttribute(
+                \Adfix\Squarefeed\Helper\Data::PRODUCT_UPDATED_AT_TIME_ATTR,
+                'catalog_product/' . \Adfix\Squarefeed\Helper\Data::PRODUCT_UPDATED_AT_TIME_ATTR,
+                'entity_id',
+                null,
+                'left'
+            );
             $this->productCollection->addAttributeToFilter(
                 [
                     ['attribute' => \Adfix\Squarefeed\Helper\Data::PRODUCT_UPDATED_AT_TIME_ATTR, 'gteq' => $formatDate],
