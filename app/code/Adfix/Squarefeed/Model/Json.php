@@ -17,11 +17,6 @@ use Magento\CatalogInventory\Model\Stock\ItemFactory;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Catalog\Model\ResourceModel\Product as ResourceProduct;
 
-/**
- * Class Json
- *
- * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
- */
 class Json implements JsonInterface
 {
     const IN_STOCK_STATUS = 'in stock';
@@ -302,7 +297,7 @@ class Json implements JsonInterface
             $this->parentProducts[$productId] = $this->getParentProductAttrArray($products[$productId]);
         }
 
-        return ($this->parentProducts[$productId]) ?? [];
+        return (isset($this->parentProducts[$productId])) ? $this->parentProducts[$productId] : [];
     }
 
     /**
