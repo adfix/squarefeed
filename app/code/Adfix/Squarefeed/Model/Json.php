@@ -438,18 +438,20 @@ class Json implements JsonInterface
     protected function setSalePrice(&$product, $currency)
     {
         $product['sale_price'] = '';
-        if ((!isset($product['special_price']) || !$product['special_price'] > 0)
-            && !isset($product['special_from_date']) && !isset($product['special_to_date'])) {
+        if (!isset($product['special_price']) || (float)$product['special_price'] == 0) {
             return $product;
         }
 
         $currentDateTime = $this->dateTime->date();
-        if (isset($product['special_from_date']) && $product['special_from_date'] <= $currentDateTime ||
-            isset($product['special_to_date']) && $product['special_to_date'] >= $currentDateTime) {
-
-            $product['sale_price'] = round($product['special_price'], 2) . $currency;
+        if (isset($product['special_from_date']) && $product['special_from_date'] > $currentDateTime) {
+            return $product;
         }
 
+        if (isset($product['special_to_date']) && $product['special_to_date'] < $currentDateTime) {
+            return $product;
+        }
+
+        $product['sale_price'] = round($product['special_price'], 2) . $currency;
         return $product;
     }
 
