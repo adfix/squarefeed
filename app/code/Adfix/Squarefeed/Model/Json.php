@@ -19,6 +19,14 @@ use Magento\Catalog\Model\ResourceModel\Product as ResourceProduct;
 
 class Json implements JsonInterface
 {
+    const STATUS_ENABLED = 'Enabled';
+    const STATUS_DISABLED = 'Disabled';
+
+    const VISIBILITY_NOT_VISIBLE = 'Not Visible Individually';
+    const VISIBILITY_IN_CATALOG = 'Catalog';
+    const VISIBILITY_IN_SEARCH = 'Search';
+    const VISIBILITY_BOTH = 'Catalog, Search';
+
     const IN_STOCK_STATUS = 'in stock';
     const OUT_OF_STOCK_STATUS = 'out of stock';
     const MEDIA_IMAGE_PATH = 'catalog/products';
@@ -241,6 +249,8 @@ class Json implements JsonInterface
     {
         $this->setSalePrice($product, $this->getCurrencyCode());
         $this->setImagesPath($product, $this->getBaseMediaUrl());
+        $this->setProductStatus($product);
+        $this->setProductVisibility($product);
 
         if (!isset($product['gtin'])) {
             if (isset($product['upc'])) {
@@ -402,6 +412,41 @@ class Json implements JsonInterface
         }
 
         return $availability;
+    }
+
+    /**
+     * Set product status without translation
+     *
+     * @param $product
+     * @return mixed
+     */
+    protected function setProductStatus(&$product)
+    {
+        $product['status'] = ($product['status'] == __(self::STATUS_ENABLED)) ?
+            self::STATUS_ENABLED : self::STATUS_DISABLED;
+
+        return $product;
+    }
+
+    /**
+     * Set product visibility without translation
+     *
+     * @param $product
+     * @return mixed
+     */
+    protected function setProductVisibility(&$product)
+    {
+        if ($product['visibility'] == __(self::VISIBILITY_BOTH)) {
+            $product['visibility'] = self::VISIBILITY_BOTH;
+        } elseif ($product['visibility'] == __(self::VISIBILITY_IN_CATALOG)) {
+            $product['visibility'] = self::VISIBILITY_IN_CATALOG;
+        } elseif ($product['visibility'] == __(self::VISIBILITY_IN_SEARCH)) {
+            $product['visibility'] = self::VISIBILITY_IN_SEARCH;
+        } else {
+            $product['visibility'] = self::VISIBILITY_NOT_VISIBLE;
+        }
+
+        return $product;
     }
 
     /**

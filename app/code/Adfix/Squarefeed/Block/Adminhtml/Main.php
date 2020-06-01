@@ -18,7 +18,7 @@ class Main extends Template
     const PLATFORM = 'magento';
     const PLATFORM_FOR_SELECTION = 'squarefeed';
     const STORE_URL_FOR_SELECTION = 'https://squarefeed.io';
-    const APP_VERSION = '2.0.5';
+    const APP_VERSION = '2.0.6';
     const API_URI = 'rest/V1/squarefeed/json';
 
     /**
