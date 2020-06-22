@@ -21,6 +21,10 @@
             if (e.data.command === 'resize') {
                 document.getElementById('SquarefeedIframe').style.height = e.data.height + 'px';
             }
+
+            if (e.data.command === 'reload') {
+                window.location.reload();
+            }
         }, false);
     }
 </script>

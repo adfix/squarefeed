@@ -68,7 +68,10 @@ class Main extends Template
      */
     public function getIframeUrl()
     {
-        return DataHelper::IFRAME_URL . '?platform=' . $this->getPlatformInfo();
+        $iframeUrl = ($this->dataHelper->isEnvInStagingMode()) ?
+            DataHelper::IFRAME_URL_STAGING : DataHelper::IFRAME_URL;
+
+        return $iframeUrl . '?platform=' . $this->getPlatformInfo();
     }
 
     /**

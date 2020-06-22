@@ -10,6 +10,7 @@ use Adfix\Squarefeed\Logger\Logger;
 use Magento\Framework\App\Helper\Context;
 use Magento\Framework\Locale\ResolverInterface;
 use Magento\Framework\App\Helper\AbstractHelper;
+use Magento\Framework\Stdlib\CookieManagerInterface;
 use \Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Integration\Api\IntegrationServiceInterface;
 use Magento\Integration\Api\OauthServiceInterface as IntegrationOauthService;
@@ -21,7 +22,10 @@ class Data extends AbstractHelper
 
     const PRODUCT_UPDATED_AT_TIME_ATTR = 'sf_updated_at';
 
+    const ENV_COOKIE_NAME = 'env';
+    const ENV_STAGING_MDOE_NAME = 'staging';
     const IFRAME_URL = 'https://core.squarefeed.io:8088';
+    const IFRAME_URL_STAGING = 'https://staging.squarefeed.io:8088';
     const XML_META_TAG = 'squarefeed/settings/meta_tag';
     const API_INTEGRATION_NAME = 'Squarefeed';
     const API_INTEGRATION_EMAIL = 'support@squarefeed.io';
@@ -35,6 +39,11 @@ class Data extends AbstractHelper
      * @var ScopeConfigInterface
      */
     protected $scopeConfig;
+
+    /**
+     * @var CookieManagerInterface
+     */
+    protected $cookieManager;
 
     /**
      * @var ResolverInterface
@@ -53,9 +62,11 @@ class Data extends AbstractHelper
 
     /**
      * Data constructor.
+     *
      * @param Context $context
      * @param Logger $logger
      * @param ResolverInterface $localeResolver
+     * @param CookieManagerInterface $cookieManager
      * @param IntegrationServiceInterface $integrationService
      * @param IntegrationOauthService $integrationOauthService
      */
@@ -63,16 +74,32 @@ class Data extends AbstractHelper
         Context $context,
         Logger $logger,
         ResolverInterface $localeResolver,
+        CookieManagerInterface $cookieManager,
         IntegrationServiceInterface $integrationService,
         IntegrationOauthService $integrationOauthService
     ) {
         parent::__construct($context);
 
         $this->logger = $logger;
+        $this->cookieManager = $cookieManager;
         $this->localeResolver = $localeResolver;
         $this->scopeConfig = $context->getScopeConfig();
         $this->integrationService = $integrationService;
         $this->integrationOauthService = $integrationOauthService;
+    }
+
+    /**
+     * Check if environment in staging mode
+     *
+     * @return bool
+     */
+    public function isEnvInStagingMode()
+    {
+        if ($this->cookieManager->getCookie(self::ENV_COOKIE_NAME) === self::ENV_STAGING_MDOE_NAME) {
+            return true;
+        }
+
+        return false;
     }
 
     /**

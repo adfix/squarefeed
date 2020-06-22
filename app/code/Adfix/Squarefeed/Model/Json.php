@@ -29,7 +29,7 @@ class Json implements JsonInterface
 
     const IN_STOCK_STATUS = 'in stock';
     const OUT_OF_STOCK_STATUS = 'out of stock';
-    const MEDIA_IMAGE_PATH = 'catalog/products';
+    const MEDIA_IMAGE_PATH = 'catalog/product';
     const ATTRIBUTE_CODE_PREFIX = 'sf_';
     const PARENT_PRODUCT_ATTRIBUTE_SUFFIX = ' (parent)';
 
@@ -224,8 +224,9 @@ class Json implements JsonInterface
 
             $parenProductData = $this->setParentProductData($products, $parentProductId);
             if (!isset($products[$productId]['link'])) {
-                $products[$productId]['link'] = $this->getBaseUrl() .
-                    $parenProductData['url_key' . self::PARENT_PRODUCT_ATTRIBUTE_SUFFIX];
+                $parentLink = isset($parenProductData['url_key' . self::PARENT_PRODUCT_ATTRIBUTE_SUFFIX]) ?
+                    $parenProductData['url_key' . self::PARENT_PRODUCT_ATTRIBUTE_SUFFIX] : '';
+                $products[$productId]['link'] = $this->getBaseUrl() . $parentLink;
             }
 
             if (isset($products[$productId]['link_key'])) {
