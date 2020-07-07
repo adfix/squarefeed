@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @package Adfix_Squarefeed
+ * @author  Alona Tsarova
+ */
+-->
+
+<csp_whitelist xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Csp:etc/csp_whitelist.xsd">
+    <policies>
+        <policy id="frame-src">
+            <values>
+                <value id="squarefeed.io" type="host">*.squarefeed.io</value>
+                <value id="squarefeed.io:8088" type="host">*.squarefeed.io:8088</value>
+            </values>
+        </policy>
+    </policies>
+</csp_whitelist>
