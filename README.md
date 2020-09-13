@@ -1,4 +1,5 @@
 # Squarefeed Google Shopping Ads
+[Installation guide](https://squarefeed.io/m2-installation-guide-marketplace/)
 
 ## Overview
 
