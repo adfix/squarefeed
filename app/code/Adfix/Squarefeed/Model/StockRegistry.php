@@ -11,6 +11,8 @@ use Adfix\Squarefeed\Api\StockRegistryInterface;
 use Magento\CatalogInventory\Api\StockConfigurationInterface;
 use Magento\CatalogInventory\Api\StockItemRepositoryInterface;
 use Magento\CatalogInventory\Api\StockItemCriteriaInterfaceFactory;
+use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory  as ProductCollectionFactory;
+use Magento\Store\Model\StoreManagerInterface;
 
 /**
  * Class StockRegistry
@@ -40,23 +42,38 @@ class StockRegistry implements StockRegistryInterface
     protected $stockItemRepository;
 
     /**
+     * @var \Magento\Store\Model\StoreManagerInterface
+     */
+    protected $storeManager;
+
+    /**
+     * @var \Magento\Catalog\Model\ResourceModel\Product\Collection
+     */
+    protected $productCollection;
+
+    /**
      * StockRegistry constructor.
-     *
      * @param DateTime $dateTime
      * @param StockConfigurationInterface $stockConfiguration
      * @param StockItemRepositoryInterface $stockItemRepository
      * @param StockItemCriteriaInterfaceFactory $criteriaFactory
+     * @param StoreManagerInterface $storeManager
+     * @param ProductCollectionFactory $productCollection
      */
     public function __construct(
         DateTime $dateTime,
         StockConfigurationInterface $stockConfiguration,
         StockItemRepositoryInterface $stockItemRepository,
-        StockItemCriteriaInterfaceFactory $criteriaFactory
+        StockItemCriteriaInterfaceFactory $criteriaFactory,
+        StoreManagerInterface $storeManager,
+        ProductCollectionFactory $productCollection
     ) {
         $this->date = $dateTime;
         $this->stockConfiguration = $stockConfiguration;
         $this->stockItemRepository = $stockItemRepository;
         $this->criteriaFactory = $criteriaFactory;
+        $this->storeManager = $storeManager;
+        $this->productCollection = $productCollection;
     }
 
     /**
@@ -68,24 +85,33 @@ class StockRegistry implements StockRegistryInterface
      */
     public function getList($currentPage = 0, $pageSize = 0)
     {
-        $scopeId = $this->stockConfiguration->getDefaultScopeId();
+        $collection = $this->productCollection->create();
+        $collection->addAttributeToSelect('*');
+        $collection->addStoreFilter($this->storeManager->getStore());
+        $collection->getSelect()
+            ->reset(\Zend_Db_Select::COLUMNS);
+        $collection->addAttributeToSelect('*')->setFlag('has_stock_status_filter', true);
+        $collection->joinField('cataloginventory',
+            'cataloginventory_stock_item',
+            '*',
+            'product_id=entity_id',
+            null,
+            'left'
+        );
 
-        /** @var \Magento\CatalogInventory\Api\StockItemCriteriaInterface $criteria */
-        $criteria = $this->criteriaFactory->create();
-        $criteria->setScopeFilter($scopeId);
+        $collection->getSelect()
+            ->columns('type_id');
 
         if ((int)$currentPage !== 0 && (int)$pageSize !== 0) {
-            $criteria->setLimit((int)$currentPage, (int)$pageSize);
+            $collection->setCurPage((int)$currentPage);
+            $collection->setPageSize((int)$pageSize);
         }
-
-        /** @var \Magento\CatalogInventory\Api\Data\StockItemCollectionInterface $list */
-        $list = $this->stockItemRepository->getList($criteria);
 
         $items = [];
-        foreach ($list->getItems() as $item) {
+        foreach ($collection->getItems() as $item) {
             $items[] = $item->getData();
         }
-        $itemsTotal = $list->getTotalCount();
+        $itemsTotal = $collection->getSize();
         $response = [
             'status' => 'OK',
             'total' => $itemsTotal,
